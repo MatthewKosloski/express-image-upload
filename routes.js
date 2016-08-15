@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const rimraf = require('rimraf');
 const mkdirp = require('mkdirp');
+const helpers = require('./helpers');
 
 const router = express.Router();
 
@@ -19,27 +20,22 @@ const upload = multer({
 });
 
 router.get('/', (req, res, next) => {
-	res.sendFile(__dirname + '/index.html');
-	mkdirp('temp', (err) => {
-    	if (err) console.error(err)
-	});
+	res.sendFile(path.join(__dirname, 'index.html'));
+	mkdirp('temp', (err) => {if (err) console.error(err)});
 });
 
 router.post('/', upload.single('photo'), (req, res, next) => {
 	const uploadedPhoto = req.file;
+	const {filename, mimetype} = uploadedPhoto;
 	if(uploadedPhoto) {
 		fs.readFile(uploadedPhoto.path, (err, data) => {
 			if(err) return next(err);
-			const {filename, mimetype} = uploadedPhoto;
-			const ext = `.${mimetype.substring(mimetype.search(/(?!image\/)(jpeg|jpg|png)/))}`;
-			const filenameWithExt = `${uploadedPhoto.filename}${ext}`;
+			const filenameWithExt = helpers.filenameWithExt(filename, mimetype);
 			fs.writeFile(filenameWithExt, data, {encoding: 'base64'}, (err) => {
 				if(err) return next(err);
 				fs.rename(filenameWithExt, path.join(__dirname, `public/images/${filenameWithExt}`), (err) => {
 					if(err) return next(err);
-					rimraf('temp', (err) => {
-						if (err) console.log(err);
-					});
+					rimraf('temp', (err) => {if (err) console.log(err)});
 					res.redirect('/images/' + filenameWithExt);
 				});
 			});
