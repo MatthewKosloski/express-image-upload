@@ -3,6 +3,6 @@ Upload images to an Express server to be served under a static directory.  All u
 
 # Usage
 1. Download repo and install dependencies. `npm install`.
-2. Create an 'images' folder within the public directory. `cd public && mkdir images`
+2. Create an 'images' folder within a public directory. `mkdir public/images`
 2. Run `npm start` and navigate to `http://localhost:3000`.
 3. Upload either a `.jpeg, .jpg, or .png` photo.
